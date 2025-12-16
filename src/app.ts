@@ -4,13 +4,13 @@ dotenv.config();
 
 import { prisma } from "./db";
 import { productsRouter } from "./routes/products.routes";
+import { ordersRouter } from "./routes/orders.routes";
 
 const app = express();
-
-// products routes
-app.use("/products", productsRouter);
-
 app.use(express.json());
+
+app.use("/products", productsRouter);
+app.use("/orders", ordersRouter);
 
 // health-check + перевірка БД
 app.get("/health", async (_req, res) => {
