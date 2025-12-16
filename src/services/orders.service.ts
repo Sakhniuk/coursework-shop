@@ -68,3 +68,25 @@ export async function createOrderWithItems(input: unknown) {
     });
   });
 }
+export async function listUsers(take = 20, skip = 0) {
+  return prisma.user.findMany({
+    where: { deletedAt: null },
+    orderBy: { createdAt: "desc" },
+    take,
+    skip
+  });
+}
+export async function customerLTV() {
+  return prisma.$queryRawUnsafe(`
+    SELECT
+      u.id,
+      u.email,
+      COUNT(o.id) AS orders_count,
+      SUM(o.total) AS total_spent
+    FROM "User" u
+    JOIN "Order" o ON o."userId" = u.id
+    WHERE o.status = 'COMPLETED'
+    GROUP BY u.id, u.email
+    ORDER BY total_spent DESC;
+  `);
+}
