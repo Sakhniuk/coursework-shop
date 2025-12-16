@@ -8,10 +8,6 @@
   "test": "jest",
   "migrate": "prisma migrate dev"
 },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "@prisma/client": "^6.19.1",
     "dotenv": "^17.2.3",
