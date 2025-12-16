@@ -3,8 +3,13 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { prisma } from "./db";
+import { productsRouter } from "./routes/products.routes";
 
 const app = express();
+
+// products routes
+app.use("/products", productsRouter);
+
 app.use(express.json());
 
 // health-check + перевірка БД
