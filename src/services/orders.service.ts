@@ -90,3 +90,41 @@ export async function customerLTV() {
     ORDER BY total_spent DESC;
   `);
 }
+
+export async function listOrdersByUser(userId: number) {
+  return prisma.order.findMany({
+    where: { userId },
+    include: { items: true },
+    orderBy: { createdAt: "desc" }
+  });
+}
+
+const UpdateOrderStatusSchema = z.object({
+  orderId: z.number().int().positive(),
+  newStatus: z.enum(["PENDING", "PAID", "SHIPPED", "COMPLETED", "CANCELED"]),
+  expectedVersion: z.number().int().nonnegative()
+});
+
+export async function updateOrderStatusOptimistic(input: unknown) {
+  const data = UpdateOrderStatusSchema.parse(input);
+
+  const updated = await prisma.order.updateMany({
+    where: {
+      id: data.orderId,
+      version: data.expectedVersion
+    },
+    data: {
+      status: data.newStatus,
+      version: { increment: 1 }
+    }
+  });
+
+  if (updated.count === 0) {
+    throw new Error("CONCURRENT_UPDATE");
+  }
+
+  return prisma.order.findUnique({
+    where: { id: data.orderId },
+    include: { items: true }
+  });
+}
